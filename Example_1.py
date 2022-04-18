@@ -40,11 +40,11 @@ layout1 = [
     [sg.Combo(['red','blue','black','yellow','green','magenta','cyan'] ,default_value='black',key='color')],
     [sg.T('What style would you like your plot?')],
     [sg.Combo(['solid','dotted','dashed'], default_value='solid', key = 'linestyle')],
-    [sg.Checkbox('Set x-range of plot', default = False, key = 'x_range'),sg.T('From')
+    [sg.Checkbox('Set x-range of plot (with floats)', default = False, key = 'x_range'),sg.T('From')
      ,sg.Input(key='x_min'),sg.T(' to '), sg.Input(key = 'x_max')],
-    [sg.Checkbox('Set y-range of plot', default = False, key = 'y_range'),sg.T('From')
+    [sg.Checkbox('Set y-range of plot (with floats)', default = False, key = 'y_range'),sg.T('From')
      ,sg.Input(key='y_min'),sg.T(' to '), sg.Input(key = 'y_max')],
-    [sg.B('Plot'), sg.B('Clear Canvas'),sg.B('Exit')],
+    [sg.B('Plot backend data'),sg.B('Plot function'), sg.B('Clear Canvas'),sg.B('Exit')],
     [sg.T('Controls:')],
     [sg.Canvas(key='controls_cv')],
     [sg.T('Figure:')],
@@ -69,15 +69,18 @@ while True:
     print(event, values)
     if event in (sg.WIN_CLOSED, 'Exit'):  # always,  always give a way out!
         break
-    elif event == 'Plot':
+    elif event == 'Plot function':
         plt.figure(1)
         fig = plt.gcf()
         DPI = fig.get_dpi()
         # ------------------------------- you have to play with this size to reduce the movement error when the mouse hovers over the figure, it's close to canvas size
         fig.set_size_inches(404 * 2 / float(DPI), 344 / float(DPI))
         # ------------------------------
-        # this can be changed to set the automatic x-range of the plot
-        x = np.linspace(0, 2 * np.pi)
+        if (values['x_range'] == True):
+            x = np.linspace(0,float(values['x_max']))
+        else:
+            # this can be changed to set the automatic x-range of the plot
+            x = np.linspace(0, 2 * np.pi)
         
         y = eval(values['function'])
         plt.title(values['function'])
@@ -85,10 +88,10 @@ while True:
         plt.plot(x, y, color = values['color'],linestyle = values['linestyle'])
         
         if (values['x_range']==True):
-            plt.xlim(int(values['x_min']), int(values['x_max']))
+            plt.xlim(float(values['x_min']), float(values['x_max']))
         
         if (values['y_range']==True):
-            plt.ylim(int(values['y_min']), int(values['y_max']))
+            plt.ylim(float(values['y_min']), float(values['y_max']))
     
         plt.xlabel(values['x_label'])
         plt.ylabel(values['y_label'])
@@ -100,4 +103,25 @@ while True:
     elif event == 'Clear Canvas':
         plt.close('all')
         plt.show()
+        
+    elif event =='Plot backend data':
+        plt.figure(1)
+        fig = plt.gcf()
+        DPI = fig.get_dpi()
+        # ------------------------------- you have to play with this size to reduce the movement error when the mouse hovers over the figure, it's close to canvas size
+        fig.set_size_inches(404 * 2 / float(DPI), 344 / float(DPI))
+                            
+        # put your own code here
+        # you can put your data/ matplotlib functions here, and then 
+        # display the plot in the GUI by calling the draw_figure_w_toolbar function
+        
+        x = np.array([5,7,8,7,2,17,2,9,4,11,12,9,6])
+        y = np.array([99,86,87,88,111,86,103,87,94,78,77,85,86])
+
+        plt.scatter(x, y)
+        
+        #leave this function to display your plot
+        draw_figure_w_toolbar(window['fig_cv'].TKCanvas, fig, window['controls_cv'].TKCanvas)
+    
+        
 window.close()
