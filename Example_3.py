@@ -7,7 +7,6 @@ Created on Thu Feb 24 08:49:38 2022
 import PySimpleGUI as sg
 import numpy as np
 import time
-#from matplotlib.animation import FuncAnimation
 import psutil
 import collections
 # ------------------------------- This is to include a matplotlib figure in a Tkinter canvas
@@ -33,6 +32,9 @@ class Toolbar(NavigationToolbar2Tk):
     def __init__(self, *args, **kwargs):
         super(Toolbar, self).__init__(*args, **kwargs)
         
+# i is the iteration of data, data is the data you would like to plot, canvas is the
+# canvas element that you are putting your plot in, and controls_canvas is the canvas
+# element you are putting the toolbar in
 def plot_live_data(i,data,canvas,controls_canvas):
    for ax in plt.gcf().axes:
        
@@ -60,12 +62,10 @@ def plot_live_data(i,data,canvas,controls_canvas):
        
    # plot cpu
    plt.plot(data,color='red')
-   plt.ylim(0,100)    # plot memory
 
    draw_figure_w_toolbar(
        canvas, fig,controls_canvas)
 
-# ------------------------------- PySimpleGUI CODE
 
 layout1 = [
     [sg.B('Plot live data'),sg.B('Stop plotting live data'),sg.B('Exit')],
@@ -107,7 +107,7 @@ plot_live = False
 while True:
     # set timeout equal to the the number of milliseconds between iterations of the graph
     # values smaller than 50 may not show the graph effectively
-    event, values = window.read(timeout=200)
+    event, values = window.read(timeout=100)
     print(event, values)
     if event in (sg.WIN_CLOSED, 'Exit'):  # always,  always give a way out!
         break
